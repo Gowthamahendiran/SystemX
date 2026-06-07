@@ -176,13 +176,6 @@ export function DailyQuestPanel({ user }: DailyQuestPanelProps) {
 
   return (
     <Box className="daily-quest-page">
-      <Stack direction="row" className="daily-quest-titlebar">
-        <Box>
-          <Typography component="h2">Daily Quest</Typography>
-          <Typography>Complete your daily quests and build your streak.</Typography>
-        </Box>
-      </Stack>
-
       {isLoading ? (
         <Card className="daily-quest-list-card single">
           <Box className="daily-quest-loading">
@@ -190,17 +183,21 @@ export function DailyQuestPanel({ user }: DailyQuestPanelProps) {
           </Box>
         </Card>
       ) : quests.length === 0 ? (
-        <Card className="daily-quest-empty-card">
+        <Box className="daily-quest-empty-card">
           {error ? <Typography className="daily-quest-error">{error}</Typography> : null}
-          <Image src="/noquest.png" alt="No daily quests" width={360} height={360} priority />
-          <Typography component="h3">No Daily Quests</Typography>
-          <Typography>
-            You don&apos;t have any daily quests yet. Create your first quest and start building your streak!
-          </Typography>
-          <Button variant="contained" startIcon={<FaPlus />} onClick={() => setIsAdding(true)}>
-            Create New Quest
-          </Button>
-        </Card>
+          <Box className="daily-quest-empty-visual">
+            <Image src="/noquest.png" alt="No daily quests" width={360} height={360} priority />
+          </Box>
+          <Box className="daily-quest-empty-copy">
+            <Typography component="h3">No Daily Quests Yet</Typography>
+            <Typography>
+              You don&apos;t have any daily quests yet. Create your first quest and start building your streak!
+            </Typography>
+            <Button variant="contained" startIcon={<FaPlus />} onClick={() => setIsAdding(true)}>
+              Create New Quest
+            </Button>
+          </Box>
+        </Box>
       ) : (
         <Card className="daily-quest-list-card">
           <Stack direction="row" className="daily-quest-progress-head">

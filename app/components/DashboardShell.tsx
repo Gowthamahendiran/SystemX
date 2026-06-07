@@ -153,8 +153,14 @@ export function DashboardShell({ active, pageTitle, user }: DashboardShellProps)
       </Box>
 
       <Box className="dashboard-main">
-        <Box component="header" className="dashboard-topbar">
-          <Box />
+        <Box component="header" className={active === "daily-quest" ? "dashboard-topbar with-page-title" : "dashboard-topbar"}>
+          {active === "daily-quest" ? (
+            <Box className="topbar-page-title">
+              <Typography component="h1">Daily Quest</Typography>
+            </Box>
+          ) : (
+            <Box />
+          )}
           <IconButton className="user-avatar-button" onClick={(event) => setAnchorEl(event.currentTarget)}>
             <Avatar src={user.photoURL || undefined}>{displayName.charAt(0).toUpperCase()}</Avatar>
           </IconButton>
