@@ -30,7 +30,6 @@ import {
 import {
   FaBookOpen,
   FaBrain,
-  FaBullseye,
   FaDumbbell,
   FaHeartPulse,
   FaPlus,
@@ -78,7 +77,6 @@ export function DailyQuestPanel({ user }: DailyQuestPanelProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const [questName, setQuestName] = useState("");
-  const [target, setTarget] = useState("");
   const [category, setCategory] = useState<QuestCategory>("fitness");
   const [savingId, setSavingId] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -120,7 +118,6 @@ export function DailyQuestPanel({ user }: DailyQuestPanelProps) {
 
   function resetForm() {
     setQuestName("");
-    setTarget("");
     setCategory("fitness");
   }
 
@@ -142,7 +139,6 @@ export function DailyQuestPanel({ user }: DailyQuestPanelProps) {
       setSavingId("new");
       await addDoc(questsRef, {
         name,
-        target: target.trim(),
         category,
         checks: {
           [todayKey]: false,
@@ -253,7 +249,7 @@ export function DailyQuestPanel({ user }: DailyQuestPanelProps) {
         open={isAdding}
         onClose={closeModal}
         fullWidth
-        maxWidth="xs"
+        maxWidth="sm"
         slotProps={{ paper: { className: "quest-dialog" } }}
       >
         <DialogTitle>
@@ -291,21 +287,6 @@ export function DailyQuestPanel({ user }: DailyQuestPanelProps) {
                 );
               })}
             </Box>
-
-            <Typography>
-              Target <span>(Optional)</span>
-            </Typography>
-            <TextField
-              placeholder="e.g. 100, 10km, 30 min"
-              value={target}
-              onChange={(event) => setTarget(event.target.value)}
-              fullWidth
-              slotProps={{
-                input: {
-                  endAdornment: <FaBullseye />,
-                },
-              }}
-            />
 
             <Stack direction="row" className="quest-dialog-actions">
               <Button type="button" variant="outlined" onClick={closeModal}>

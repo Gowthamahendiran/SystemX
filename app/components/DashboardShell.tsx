@@ -6,6 +6,9 @@ import {
   Avatar,
   Box,
   Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   Divider,
   IconButton,
   ListItemIcon,
@@ -23,6 +26,7 @@ import {
   FaListCheck,
   FaRightFromBracket,
   FaUser,
+  FaXmark,
 } from "react-icons/fa6";
 import { IoChevronBack, IoChevronForward, IoSettingsSharp } from "react-icons/io5";
 import { RiSwordFill } from "react-icons/ri";
@@ -69,8 +73,25 @@ function getDisplayName(user: User) {
   return user.displayName || user.email?.split("@")[0] || "User";
 }
 
+function getUserDetails(user: User) {
+  return [
+    { label: "Name", value: getDisplayName(user) },
+    { label: "Email", value: user.email },
+    { label: "Email verified", value: user.emailVerified ? "Yes" : "No" },
+    { label: "Phone", value: user.phoneNumber },
+    { label: "User ID", value: user.uid },
+    { label: "Provider", value: user.providerId },
+    { label: "Anonymous", value: user.isAnonymous ? "Yes" : "No" },
+    { label: "Tenant ID", value: user.tenantId },
+    { label: "Created", value: user.metadata.creationTime },
+    { label: "Last sign in", value: user.metadata.lastSignInTime },
+    { label: "Photo URL", value: user.photoURL },
+  ];
+}
+
 export function DashboardShell({ active, pageTitle, user }: DashboardShellProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
     if (typeof window === "undefined") {
       return false;
@@ -80,6 +101,7 @@ export function DashboardShell({ active, pageTitle, user }: DashboardShellProps)
   });
 
   const displayName = getDisplayName(user);
+  const userDetails = useMemo(() => getUserDetails(user), [user]);
   const greeting = useMemo(() => getGreeting(), []);
   const dateLabel = useMemo(
     () =>
@@ -100,6 +122,11 @@ export function DashboardShell({ active, pageTitle, user }: DashboardShellProps)
       window.localStorage.setItem(SIDEBAR_STORAGE_KEY, String(nextValue));
       return nextValue;
     });
+  }
+
+  function openUserDetails() {
+    setAnchorEl(null);
+    setIsUserDialogOpen(true);
   }
 
   function renderNav(items: typeof mainNav | typeof bottomNav) {
@@ -179,7 +206,7 @@ export function DashboardShell({ active, pageTitle, user }: DashboardShellProps)
               </Box>
             </Box>
             <Divider />
-            <MenuItem disabled>
+            <MenuItem onClick={openUserDetails}>
               <ListItemIcon>
                 <FaUser />
               </ListItemIcon>
@@ -192,6 +219,51 @@ export function DashboardShell({ active, pageTitle, user }: DashboardShellProps)
               Logout
             </MenuItem>
           </Menu>
+
+          <Dialog
+            open={isUserDialogOpen}
+            onClose={() => setIsUserDialogOpen(false)}
+            fullWidth
+            maxWidth="sm"
+            slotProps={{ paper: { className: "user-details-dialog" } }}
+          >
+            <DialogTitle>
+              User Details
+              <IconButton aria-label="Close user details" onClick={() => setIsUserDialogOpen(false)}>
+                <FaXmark />
+              </IconButton>
+            </DialogTitle>
+            <DialogContent>
+              <Box className="user-details-profile">
+                <Avatar src={user.photoURL || undefined}>{displayName.charAt(0).toUpperCase()}</Avatar>
+                <Box>
+                  <Typography component="h2">{displayName}</Typography>
+                  <Typography>{user.email || "No email added"}</Typography>
+                </Box>
+              </Box>
+
+              <Box className="user-details-grid">
+                {userDetails.map((item) => (
+                  <Box key={item.label} className="user-details-row">
+                    <Typography>{item.label}</Typography>
+                    <span>{item.value || "Not available"}</span>
+                  </Box>
+                ))}
+              </Box>
+
+              {user.providerData.length > 0 ? (
+                <Box className="user-provider-list">
+                  <Typography component="h3">Linked Providers</Typography>
+                  {user.providerData.map((provider) => (
+                    <Box key={`${provider.providerId}-${provider.uid}`} className="user-provider-item">
+                      <Typography>{provider.providerId}</Typography>
+                      <span>{provider.email || provider.phoneNumber || provider.uid}</span>
+                    </Box>
+                  ))}
+                </Box>
+              ) : null}
+            </DialogContent>
+          </Dialog>
         </Box>
 
         <Box component="main" className="dashboard-content">
